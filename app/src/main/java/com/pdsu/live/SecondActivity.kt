@@ -2,8 +2,14 @@ package com.pdsu.live
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.lifecycle.lifecycleScope
 import com.pdsu.live.databinding.ActivitySecondBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 
 class SecondActivity : AppCompatActivity() {
 
@@ -39,18 +45,48 @@ class SecondActivity : AppCompatActivity() {
 ////            binding.tvNum.text = resultNum.toString()
 //            binding.tvNum.text = (one.await() + two.await()).toString()
 
+//
+//        //2.启动协程
+//        scope.launch(Dispatchers.Unconfined) {
+//            val one = getResult(20)
+//            val two = getResult(40)
+//
+//            runOnUiThread {
+//                binding.tvNum.text = "(one + two).toString()"
+//                binding.tvNum.text = (one + two).toString()
+//            }
+//        }
+
 
         //2.启动协程
         scope.launch(Dispatchers.Unconfined) {
-            val one = getResult(20)
-            val two = getResult(40)
+            val one = async { getResult(20) }
+            val two = async { getResult(40) }
 
+            Log.e("resultContent：", "start")
+
+            val resultContent = (one.await() + two.await()).toString()
+
+            Log.e("resultContent：", resultContent)
             runOnUiThread {
-                binding.tvNum.text = "(one + two).toString()"
-                binding.tvNum.text = (one + two).toString()
+                binding.tvNum.text = resultContent
             }
         }
 
+        lifecycleScope.launch {
+            //创建一个协程 Flow<T>
+
+            createFlow().flowOn(Dispatchers.IO)
+                .collect { num ->
+
+                    Log.e("TAG", "onCreate: $num")
+                }
+        }
+
+    }
+
+    private fun createFlow(): Flow<Int> {
+        return (1..10).asFlow()
     }
 
 
