@@ -6,10 +6,7 @@ import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.pdsu.live.databinding.ActivitySecondBinding
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 
 class SecondActivity : AppCompatActivity() {
 
@@ -79,8 +76,24 @@ class SecondActivity : AppCompatActivity() {
             createFlow().flowOn(Dispatchers.IO)
                 .collect { num ->
 
-                    Log.e("TAG", "onCreate: $num")
+                    Log.e("flow", "onCreate: $num")
                 }
+
+
+            flow<Int> {
+                for (i in 1..3) {
+                    Log.e("flow", "onCreate: $i emit")
+                    emit(i)
+                }
+            }.filter {
+                Log.e("flow", "onCreate: $it filter")
+                it % 2 != 0
+            }.map {
+                Log.e("flow", "onCreate: $it map")
+                "${it * it} money"
+            }.collect {
+                Log.e("flow", "onCreate: $it collect")
+            }
         }
 
     }
