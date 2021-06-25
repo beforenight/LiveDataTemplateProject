@@ -76,23 +76,23 @@ class SecondActivity : AppCompatActivity() {
             createFlow().flowOn(Dispatchers.IO)
                 .collect { num ->
 
-                    Log.e("flow", "onCreate: $num")
+                    Log.e("flow", "flow: $num")
                 }
 
 
             flow<Int> {
                 for (i in 1..3) {
-                    Log.e("flow", "onCreate: $i emit")
+                    Log.e("flow", "flow: $i emit")
                     emit(i)
                 }
             }.filter {
-                Log.e("flow", "onCreate: $it filter")
+                Log.e("flow", "flow: $it filter")
                 it % 2 != 0
             }.map {
-                Log.e("flow", "onCreate: $it map")
+                Log.e("flow", "flow: $it map")
                 "${it * it} money"
             }.collect {
-                Log.e("flow", "onCreate: $it collect")
+                Log.e("Flow","i get $it")
             }
         }
 
