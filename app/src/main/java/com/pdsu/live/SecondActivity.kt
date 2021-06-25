@@ -6,11 +6,14 @@ import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.pdsu.live.databinding.ActivitySecondBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
 class SecondActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySecondBinding
+
+    private val TAG = "Flow"
 
     //1.创建一个MainScope
     val scope = MainScope()
@@ -92,10 +95,63 @@ class SecondActivity : AppCompatActivity() {
                 Log.e("flow", "flow: $it map")
                 "${it * it} money"
             }.collect {
-                Log.e("Flow","i get $it")
+                Log.e("Flow", "i get $it")
             }
         }
 
+
+
+        lifecycleScope.launch {
+
+            val flow = flow<Int> {
+                for (i in 1..3) {
+                    delay(500)
+                    Log.e(TAG, "emit: $i")
+                    emit(i)
+                }
+            }
+
+
+            withTimeoutOrNull(1600)
+            {
+
+                flow.collect {
+                    delay(500)
+                    Log.e(TAG, "consume $it")
+                }
+            }
+
+            Log.e(TAG, "flow cancel")
+        }
+
+
+//        Channel
+
+        lifecycleScope.launch {
+            //1.生成一个Channel
+            val channel = Channel<Int>()
+
+            //2.channel 发送数据
+
+            launch {
+
+                for (i in 1..5) {
+                    delay(200)
+                    channel.send(i * i)
+                }
+
+                channel.close()
+
+            }
+
+
+            //3. channel 接收数据
+            launch {
+                for (y in channel) {
+                    Log.e(TAG, "Channel: get $y")
+                }
+            }
+        }
     }
 
     private fun createFlow(): Flow<Int> {
