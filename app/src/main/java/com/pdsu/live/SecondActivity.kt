@@ -2,7 +2,6 @@ package com.pdsu.live
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.pdsu.live.databinding.ActivitySecondBinding
 import kotlinx.coroutines.*
 
@@ -20,27 +19,37 @@ class SecondActivity : AppCompatActivity() {
         binding = ActivitySecondBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //2.启动协程
-        scope.launch(Dispatchers.Main) {
-
-//            val one = async {
+//        //2.启动协程
+//        scope.launch(Dispatchers.Main) {
+//
+////            val one = async {
+////                getResult(20)
+////            }
+//            val one = async(start = CoroutineStart.LAZY) {
 //                getResult(20)
 //            }
-            val one = async(start = CoroutineStart.LAZY) {
-                getResult(20)
-            }
-            val two = async {
-                getResult(40)
-            }
+//            val two = async {
+//                getResult(40)
+//            }
+//
+//            //val resultNum = one.await() + two.await()
+//
+//            Log.e("Test", one.await().toString())
+//            Log.e("Test", two.await().toString())
+////            binding.tvNum.text = resultNum.toString()
+//            binding.tvNum.text = (one.await() + two.await()).toString()
 
-            //val resultNum = one.await() + two.await()
 
-            Log.e("Test", one.await().toString())
-            Log.e("Test", two.await().toString())
-//            binding.tvNum.text = resultNum.toString()
-            binding.tvNum.text = (one.await() + two.await()).toString()
+        //2.启动协程
+        scope.launch(Dispatchers.Unconfined) {
+            val one = getResult(20)
+            val two = getResult(40)
+
+            runOnUiThread {
+                binding.tvNum.text = "(one + two).toString()"
+                binding.tvNum.text = (one + two).toString()
+            }
         }
-
 
     }
 
